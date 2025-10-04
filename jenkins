@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+    stages {
+        stage('Checkout') {
+            steps {
+                # Clones the repo to the Jenkins workspace
+                checkout scm
+            }
+        }
+        stage('Build') {
+            steps {
+                # Install dependencies and build the React app
+                sh 'npm install'
+                sh 'npm run build'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                # Copy the built files from the build directory (build/) to the Nginx web root
+                # NOTE: We need to use 'sudo' for access, but Jenkins usually runs as the 'jenkins' user.
+                # This often requires setting up proper permissions/symlinks.
+                # For this UAT, the simplest path is to copy to the web root:
+                sh 'sudo cp -r build/* /var/www/html/'
+            }
+        }
+    }
+}
